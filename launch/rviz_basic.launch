@@ -1,0 +1,16 @@
+<!-- -*- xml -*-
+     Notes here
+  -->
+
+
+<launch>
+
+<!-- Launch rviz -->
+<node type="rviz" name="rviz" pkg="rviz" args="-d $(find luna_mqp)/rviz/grid_map.rviz" />
+
+
+
+
+
+
+</launch>
