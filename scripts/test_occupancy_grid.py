@@ -6,8 +6,8 @@ from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import String
 
 def talker():
-    pub = rospy.Publisher('fake_occupancy', OccupancyGrid, queue_size=10)
-    rospy.init_node('fake_occupancy', anonymous=True)
+    pub = rospy.Publisher('fake_occupancy_grid', OccupancyGrid, queue_size=10)
+    rospy.init_node('fake_occupancy_grid', anonymous=True)
     rate = rospy.Rate(10) # 10hz
     grid = OccupancyGrid()
     # see if you can change metadata to calling on a parameter of rviz?

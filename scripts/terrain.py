@@ -46,75 +46,72 @@ def path_gen(length):
     return points
 
 
-def callback(data):
-    occupancy = data
-    rospy.loginfo(data.data)
+class TerrainMap:
+    def __init__(self):
+        rospy.init_node('terrain', anonymous=True)
+        self.rate = rospy.Rate(10)  # 10hz
 
+        sub_grid = rospy.Subscriber('fake_occupancy_grid', OccupancyGrid, self.ogrid_callback)
 
-def terrain():
-    rospy.init_node('terrain', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
+        self.pub_obs = rospy.Publisher('obstacle', GridCells, queue_size=10)
+        self.pub_clr = rospy.Publisher('clear_space', GridCells, queue_size=10)
+        self.pub_path = rospy.Publisher('path', GridCells, queue_size=10)
 
-    occupancy = []
-    sub_grid = rospy.Subscriber('fake_occupancy_grid', OccupancyGrid, callback, occupancy)
-    rospy.loginfo(str(occupancy))
+        self.raw_map = []
 
-    pub_obs = rospy.Publisher('obstacle', GridCells, queue_size=10)
-    pub_clr = rospy.Publisher('clear_space', GridCells, queue_size=10)
-    pub_path = rospy.Publisher('path', GridCells, queue_size=10)
+    def ogrid_callback(self, grid_map):
+        self.raw_map = grid_map
+        rospy.loginfo("New grid received:" + str(self.raw_map))
 
+    def run(self):
+        path_len = 1
+        obstacles = point_gen(5, 5, 70, path_len)
+        clear_space = point_gen(5, 5, 40, path_len)
+        path_points = path_gen(path_len)
 
+        time_up = rospy.get_time() + 2
+        while not rospy.is_shutdown():
+            # rospy.loginfo(str(occupancy))
 
-    path_len = 1
-    obstacles = point_gen(5, 5, 70, path_len)
-    clear_space = point_gen(5, 5, 40, path_len)
-    path_points = path_gen(path_len)
-
-    time_up = rospy.get_time() + 2
-    while not rospy.is_shutdown():
-        rospy.loginfo(str(occupancy))
-
-        if rospy.get_time() > time_up:
-            if path_len < 20:
-                path_len += 1
-            obstacles = point_gen(5, 5, 100, path_len)
-            clear_space = point_gen(5, 5, 50, path_len)
-            path_points = path_gen(path_len)
-            time_up = rospy.get_time() + 1
-        # setup obstacles
-        obs = GridCells()
-        obs.cell_width = 1
-        obs.cell_height = 1
-        obs.header.frame_id = 'map'
-        obs.cells = obstacles
-        # rospy.loginfo(str(obs))
-        # setup clear space
-        clr = GridCells()
-        clr.cell_width = 1
-        clr.cell_height = 1
-        clr.header.frame_id = 'map'
-        clr.cells = clear_space
-        # setup fake path
-        path = GridCells()
-        path.cell_width = 1
-        path.cell_height = 1
-        path.header.frame_id = 'map'
-        path.cells = path_points
-        # publish all
-        pub_obs.publish(obs)
-        pub_clr.publish(clr)
-        pub_path.publish(path)
-        rate.sleep()
-
-
-
-
+            if rospy.get_time() > time_up:
+                if path_len < 20:
+                    path_len += 1
+                obstacles = point_gen(5, 5, 100, path_len)
+                clear_space = point_gen(5, 5, 50, path_len)
+                path_points = path_gen(path_len)
+                time_up = rospy.get_time() + 1
+            # setup obstacles
+            obs = GridCells()
+            obs.cell_width = 1
+            obs.cell_height = 1
+            obs.header.frame_id = 'map'
+            obs.cells = obstacles
+            # rospy.loginfo(str(obs))
+            # setup clear space
+            clr = GridCells()
+            clr.cell_width = 1
+            clr.cell_height = 1
+            clr.header.frame_id = 'map'
+            clr.cells = clear_space
+            # setup fake path
+            path = GridCells()
+            path.cell_width = 1
+            path.cell_height = 1
+            path.header.frame_id = 'map'
+            path.cells = path_points
+            # publish all
+            self.pub_obs.publish(obs)
+            self.pub_clr.publish(clr)
+            self.pub_path.publish(path)
+            self.rate.sleep()
 
 
 
 
 if __name__ == '__main__':
     try:
-        terrain()
+        terrain = TerrainMap()
+        terrain.run()
+
     except rospy.ROSInterruptException:
         pass
