@@ -15,6 +15,12 @@ def talker():
     grid.info.width = 20
     values = [-1] * (20*20)
     # do some stuff to values here
+
+    values[3] = 50
+    values[9] = 50
+    values[20] = 50
+    values[34] = 50
+
     grid.data = values
     while not rospy.is_shutdown():
         pub.publish(grid)

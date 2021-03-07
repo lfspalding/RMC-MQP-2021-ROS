@@ -6,6 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Grid1
+        - /Grid1/Offset1
         - /obstacle_cells1
         - /clear_cells1
         - /fake_path1
@@ -48,11 +50,11 @@ Visualization Manager:
       Name: Grid
       Normal Cell Count: 0
       Offset:
-        X: 0
-        Y: 0
+        X: 10
+        Y: 10
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 20
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/Axes
@@ -111,25 +113,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 16.717498779296875
+      Distance: 41.33280563354492
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.4354364573955536
-        Y: 0.7407213449478149
-        Z: -0.498879075050354
+        X: 9.13932991027832
+        Y: 9.441158294677734
+        Z: -4.562017917633057
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8453980684280396
+      Pitch: 0.8403980731964111
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.245397686958313
+      Yaw: 4.700415134429932
     Saved: ~
 Window Geometry:
   Displays:
@@ -148,4 +150,4 @@ Window Geometry:
     collapsed: true
   Width: 1037
   X: 84
-  Y: 76
+  Y: 46

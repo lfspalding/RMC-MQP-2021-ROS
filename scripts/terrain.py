@@ -57,17 +57,36 @@ class TerrainMap:
         self.pub_clr = rospy.Publisher('clear_space', GridCells, queue_size=10)
         self.pub_path = rospy.Publisher('path', GridCells, queue_size=10)
 
-        self.raw_map = []
+        self.raw_map_data = []
+        self.raw_map = 0
+        self.width = 0
+        self.height = 0
+        self.resolution = 0
 
     def ogrid_callback(self, grid_map):
+        self.raw_map_data = grid_map.data
         self.raw_map = grid_map
-        rospy.loginfo("New grid received:" + str(self.raw_map))
+        self.width = grid_map.info.width
+        self.height = grid_map.info.height
+        self.resolution = grid_map.info.resolution
+        rospy.loginfo("New grid received:")  # + str(self.raw_map))
+        # self.map = Map(grid_map)
+
+    def sort_cells(self, min, max):
+        cells = []
+        for i, n in enumerate(self.raw_map_data):
+            if n > min & n < max:
+                x = i % self.width
+                y = i // self.width
+                cells.append(Point(x + .5, y + .5, 0))
+        rospy.loginfo(cells)
+        return cells
 
     def run(self):
         path_len = 1
-        obstacles = point_gen(5, 5, 70, path_len)
-        clear_space = point_gen(5, 5, 40, path_len)
-        path_points = path_gen(path_len)
+        obstacles = self.sort_cells(40, 100)
+        # clear_space = point_gen(5, 5, 40, path_len)
+        # path_points = path_gen(path_len)
 
         time_up = rospy.get_time() + 2
         while not rospy.is_shutdown():
@@ -76,9 +95,9 @@ class TerrainMap:
             if rospy.get_time() > time_up:
                 if path_len < 20:
                     path_len += 1
-                obstacles = point_gen(5, 5, 100, path_len)
-                clear_space = point_gen(5, 5, 50, path_len)
-                path_points = path_gen(path_len)
+                obstacles = self.sort_cells(40, 100)
+                # clear_space = point_gen(5, 5, 50, path_len)
+                # path_points = path_gen(path_len)
                 time_up = rospy.get_time() + 1
             # setup obstacles
             obs = GridCells()
@@ -87,22 +106,22 @@ class TerrainMap:
             obs.header.frame_id = 'map'
             obs.cells = obstacles
             # rospy.loginfo(str(obs))
-            # setup clear space
-            clr = GridCells()
-            clr.cell_width = 1
-            clr.cell_height = 1
-            clr.header.frame_id = 'map'
-            clr.cells = clear_space
-            # setup fake path
-            path = GridCells()
-            path.cell_width = 1
-            path.cell_height = 1
-            path.header.frame_id = 'map'
-            path.cells = path_points
+            # # setup clear space
+            # clr = GridCells()
+            # clr.cell_width = 1
+            # clr.cell_height = 1
+            # clr.header.frame_id = 'map'
+            # clr.cells = clear_space
+            # # setup fake path
+            # path = GridCells()
+            # path.cell_width = 1
+            # path.cell_height = 1
+            # path.header.frame_id = 'map'
+            # path.cells = path_points
             # publish all
             self.pub_obs.publish(obs)
-            self.pub_clr.publish(clr)
-            self.pub_path.publish(path)
+            # self.pub_clr.publish(clr)
+            # self.pub_path.publish(path)
             self.rate.sleep()
 
 
