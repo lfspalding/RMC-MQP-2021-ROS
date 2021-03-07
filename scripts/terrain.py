@@ -4,29 +4,6 @@ import rospy
 from nav_msgs.msg import GridCells, OccupancyGrid
 from geometry_msgs.msg import Point
 
-# randomly shuffle a sequence
-from random import seed
-from random import shuffle
-from random import choice
-
-
-# takes in occupancy grid, spits out lists of different types of cells
-def point_gen(x_max, y_max, n, see):
-    points = []
-    # seed random number generator
-    seed(see)
-    # prepare a sequence
-    x_range = [i for i in range(x_max*2)]
-    y_range = [j for j in range(y_max*2)]
-    for k in range(n):
-        x = choice(x_range) - x_max + .5
-        y = choice(y_range) - y_max + .5
-        points.append(Point(x, y, 0))
-        shuffle(x_range)
-        shuffle(y_range)
-    return points
-
-
 # generates fake path, switch out for A* later
 def path_gen(length):
     points = []
@@ -46,6 +23,15 @@ def path_gen(length):
     return points
 
 
+def make_gridcells(data):
+    obs = GridCells()
+    obs.cell_width = 1
+    obs.cell_height = 1
+    obs.header.frame_id = 'map'
+    obs.cells = data
+    return obs
+
+
 class TerrainMap:
     def __init__(self):
         rospy.init_node('terrain', anonymous=True)
@@ -63,6 +49,9 @@ class TerrainMap:
         self.height = 0
         self.resolution = 0
 
+        self.obstacles = []
+        self.clear = []
+
     def ogrid_callback(self, grid_map):
         self.raw_map_data = grid_map.data
         self.raw_map = grid_map
@@ -70,61 +59,41 @@ class TerrainMap:
         self.height = grid_map.info.height
         self.resolution = grid_map.info.resolution
         rospy.loginfo("New grid received:")  # + str(self.raw_map))
-        # self.map = Map(grid_map)
 
     def sort_cells(self, min, max):
         cells = []
         for i, n in enumerate(self.raw_map_data):
-            if n > min & n < max:
+            if min < n < max:
                 x = i % self.width
                 y = i // self.width
                 cells.append(Point(x + .5, y + .5, 0))
         rospy.loginfo(cells)
         return cells
 
+    def astar(self, start, end):
+        pass
+        # TODO
+
     def run(self):
         path_len = 1
-        obstacles = self.sort_cells(40, 100)
-        # clear_space = point_gen(5, 5, 40, path_len)
+        self.obstacles = self.sort_cells(40, 100) #these are probablility/possibly height values, check with John
+        self.clear = self.sort_cells(0, 40)
         # path_points = path_gen(path_len)
 
         time_up = rospy.get_time() + 2
         while not rospy.is_shutdown():
-            # rospy.loginfo(str(occupancy))
-
             if rospy.get_time() > time_up:
                 if path_len < 20:
                     path_len += 1
-                obstacles = self.sort_cells(40, 100)
-                # clear_space = point_gen(5, 5, 50, path_len)
+                self.obstacles = self.sort_cells(40, 100)
+                self.clear = self.sort_cells(0, 40)
                 # path_points = path_gen(path_len)
                 time_up = rospy.get_time() + 1
-            # setup obstacles
-            obs = GridCells()
-            obs.cell_width = 1
-            obs.cell_height = 1
-            obs.header.frame_id = 'map'
-            obs.cells = obstacles
-            # rospy.loginfo(str(obs))
-            # # setup clear space
-            # clr = GridCells()
-            # clr.cell_width = 1
-            # clr.cell_height = 1
-            # clr.header.frame_id = 'map'
-            # clr.cells = clear_space
-            # # setup fake path
-            # path = GridCells()
-            # path.cell_width = 1
-            # path.cell_height = 1
-            # path.header.frame_id = 'map'
-            # path.cells = path_points
-            # publish all
-            self.pub_obs.publish(obs)
-            # self.pub_clr.publish(clr)
+
+            self.pub_obs.publish(make_gridcells(self.obstacles))
+            self.pub_clr.publish(make_gridcells(self.clear))
             # self.pub_path.publish(path)
             self.rate.sleep()
-
-
 
 
 if __name__ == '__main__':

@@ -20,6 +20,8 @@ def talker():
     values[9] = 50
     values[20] = 50
     values[34] = 50
+    values[62] = 20
+    values[4] = 20
 
     grid.data = values
     while not rospy.is_shutdown():
