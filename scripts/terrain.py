@@ -58,7 +58,7 @@ class TerrainMap:
         self.width = grid_map.info.width
         self.height = grid_map.info.height
         self.resolution = grid_map.info.resolution
-        rospy.loginfo("New grid received:")  # + str(self.raw_map))
+        # rospy.loginfo("New grid received:")  # + str(self.raw_map))
 
     def sort_cells(self, min, max):
         cells = []
@@ -67,7 +67,7 @@ class TerrainMap:
                 x = i % self.width
                 y = i // self.width
                 cells.append(Point(x + .5, y + .5, 0))
-        rospy.loginfo(cells)
+        # rospy.loginfo(cells)
         return cells
 
     def astar(self, start, end):
