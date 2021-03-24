@@ -3,24 +3,7 @@
 import rospy
 from nav_msgs.msg import GridCells, OccupancyGrid
 from geometry_msgs.msg import Point
-
-# generates fake path, switch out for A* later
-def path_gen(length):
-    points = []
-    start = [5, 4]
-    for i in range(length):
-        points.append(Point(start[0] - .5, start[1] - .5, 0))
-        if i % 6 == 0:
-            start = [start[0] - 1, start[1]]
-        elif i % 5 == 0:
-            start = [start[0], start[1] - 1]
-        elif i % 4 == 0:
-            start = [start[0] - 1, start[1]]
-        elif i % 3 == 0:
-            start = [start[0], start[1] - 1]
-        elif i % 2 == 0:
-            start = [start[0] - 1, start[1]]
-    return points
+from astar import astar
 
 
 def make_gridcells(data):
@@ -30,6 +13,14 @@ def make_gridcells(data):
     obs.header.frame_id = 'map'
     obs.cells = data
     return obs
+
+
+def make_points(tuples):
+    point_arr = []
+    if tuples is not None:
+        for t in tuples:
+            point_arr.append(Point(t[0] + .5, t[1] + .5, 0))
+    return point_arr
 
 
 class TerrainMap:
@@ -51,6 +42,7 @@ class TerrainMap:
 
         self.obstacles = []
         self.clear = []
+        self.threshold = 40
 
     def ogrid_callback(self, grid_map):
         self.raw_map_data = grid_map.data
@@ -70,15 +62,31 @@ class TerrainMap:
         # rospy.loginfo(cells)
         return cells
 
-    def astar(self, start, end):
-        pass
-        # TODO
+    def path_gen(self, length):
+        start = (10, 0)
+        end = (3, 18)
+        maze = []
+        temp = []
+        row = []
+        for i in range(self.height):
+            for j in range(self.width):
+                temp.append(self.raw_map_data[i*self.width + j])
+            for ele in temp:
+                if ele > self.threshold:
+                    row.append(1)
+                else:
+                    row.append(0)
+            maze.append(row)
+        rospy.loginfo(maze)
+        tuple_path = astar(maze, start, end)
+        path = make_points(tuple_path)
+        return make_gridcells(path)
 
     def run(self):
         path_len = 1
         self.obstacles = self.sort_cells(40, 100) #these are probablility/possibly height values, check with John
         self.clear = self.sort_cells(0, 40)
-        # path_points = path_gen(path_len)
+        path = self.path_gen(path_len)
 
         time_up = rospy.get_time() + 2
         while not rospy.is_shutdown():
@@ -87,12 +95,12 @@ class TerrainMap:
                     path_len += 1
                 self.obstacles = self.sort_cells(40, 100)
                 self.clear = self.sort_cells(0, 40)
-                # path_points = path_gen(path_len)
+                path = self.path_gen(path_len)
                 time_up = rospy.get_time() + 1
 
             self.pub_obs.publish(make_gridcells(self.obstacles))
             self.pub_clr.publish(make_gridcells(self.clear))
-            # self.pub_path.publish(path)
+            self.pub_path.publish(path)
             self.rate.sleep()
 
 

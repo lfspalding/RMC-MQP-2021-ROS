@@ -1,0 +1,14 @@
+<!-- -*- xml -*-
+     Notes here
+  -->
+
+
+<launch>
+
+<!-- Launch rviz -->
+<node type="rviz" name="rviz" pkg="rviz" args="-d $(find luna_mqp)/rviz/grid_map.rviz" />
+<node name="terrain" pkg="luna_mqp" type="terrain.py" />
+<node name="fake_grid" pkg="luna_mqp" type="test_occupancy_grid.py" />
+
+
+</launch>
