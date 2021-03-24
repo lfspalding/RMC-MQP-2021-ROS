@@ -1,0 +1,14 @@
+<!-- -*- xml -*-
+     Notes here
+  -->
+
+
+<launch>
+
+<!-- Launch rviz -->
+<node type="rviz" name="rviz" pkg="rviz" args="-d $(find luna_mqp)/rviz/grid_map.rviz" />
+<node name="terrain" pkg="luna_mqp" type="terrain.py" />
+<node name="bag_reader" pkg="luna_mqp" type="bag_reader.py" />
+
+
+</launch>

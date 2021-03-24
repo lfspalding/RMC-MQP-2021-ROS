@@ -3,7 +3,7 @@
 import rospy
 
 from nav_msgs.msg import OccupancyGrid
-from std_msgs.msg import String
+
 
 def talker():
     pub = rospy.Publisher('fake_occupancy_grid', OccupancyGrid, queue_size=10)

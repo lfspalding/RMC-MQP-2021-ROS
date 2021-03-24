@@ -62,7 +62,7 @@ class TerrainMap:
         # rospy.loginfo(cells)
         return cells
 
-    def path_gen(self, length):
+    def path_gen(self):
         start = (10, 0)
         end = (3, 18)
         maze = []
@@ -77,25 +77,27 @@ class TerrainMap:
                 else:
                     row.append(0)
             maze.append(row)
+            temp = []
+            row = []
         rospy.loginfo(maze)
         tuple_path = astar(maze, start, end)
         path = make_points(tuple_path)
         return make_gridcells(path)
 
     def run(self):
-        path_len = 1
+        # path_len = 1
         self.obstacles = self.sort_cells(40, 100) #these are probablility/possibly height values, check with John
         self.clear = self.sort_cells(0, 40)
-        path = self.path_gen(path_len)
+        path = self.path_gen()
 
         time_up = rospy.get_time() + 2
         while not rospy.is_shutdown():
             if rospy.get_time() > time_up:
-                if path_len < 20:
-                    path_len += 1
+                # if path_len < 20:
+                #     path_len += 1
                 self.obstacles = self.sort_cells(40, 100)
                 self.clear = self.sort_cells(0, 40)
-                path = self.path_gen(path_len)
+                path = self.path_gen()
                 time_up = rospy.get_time() + 1
 
             self.pub_obs.publish(make_gridcells(self.obstacles))
