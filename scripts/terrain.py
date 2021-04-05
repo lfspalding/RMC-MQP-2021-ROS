@@ -67,18 +67,20 @@ class TerrainMap:
         end = (3, 18)
         maze = []
         temp = []
-        row = []
         for i in range(self.height):
             for j in range(self.width):
                 temp.append(self.raw_map_data[i*self.width + j])
-            for ele in temp:
+            row = [0] * len(temp)
+            for index, ele in enumerate(temp):
                 if ele > self.threshold:
-                    row.append(1)
-                else:
-                    row.append(0)
+                    row[index] = 1
+                    try:
+                        row[index+1] = 1
+                        row[index-1] = 1
+                    except IndexError:
+                        pass
             maze.append(row)
             temp = []
-            row = []
         rospy.loginfo(maze)
         tuple_path = astar(maze, start, end)
         path = make_points(tuple_path)
