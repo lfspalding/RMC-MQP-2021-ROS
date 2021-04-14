@@ -9,8 +9,8 @@ Panels:
         - /Grid1
         - /Grid1/Offset1
         - /obstacle_cells1
-        - /clear_cells1
         - /fake_path1
+        - /clear_cells1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz/Selection
@@ -66,24 +66,24 @@ Visualization Manager:
       Value: true
     - Alpha: 1
       Class: rviz/GridCells
-      Color: 52; 101; 164
+      Color: 7; 245; 235
       Enabled: true
       Name: obstacle_cells
       Topic: /obstacle
       Value: true
-    - Alpha: 0.5
-      Class: rviz/GridCells
-      Color: 115; 210; 22
-      Enabled: true
-      Name: clear_cells
-      Topic: /clear_space
-      Value: true
     - Alpha: 1
       Class: rviz/GridCells
-      Color: 245; 121; 0
+      Color: 255; 52; 254
       Enabled: true
       Name: fake_path
       Topic: /path
+      Value: true
+    - Alpha: 0.30000001192092896
+      Class: rviz/GridCells
+      Color: 25; 255; 0
+      Enabled: true
+      Name: clear_cells
+      Topic: /clear_space
       Value: true
   Enabled: true
   Global Options:
@@ -113,7 +113,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 41.33280563354492
+      Distance: 42.16359329223633
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -128,10 +128,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8353980779647827
+      Pitch: 1.1447967290878296
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.700415134429932
+      Yaw: 4.700433254241943
     Saved: ~
 Window Geometry:
   Displays:
@@ -149,5 +149,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1037
-  X: 84
-  Y: 27
+  X: 90
+  Y: 64

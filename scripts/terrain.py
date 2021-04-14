@@ -63,13 +63,13 @@ class TerrainMap:
         return cells
 
     def path_gen(self):
-        start = (8, 0)  # starting position
-        end = (15, 18)  # TODO move this if it's on an obstacle
+        start = (13, 0)  # starting position
+        end = (13, 19)  # TODO move this if it's on an obstacle
         maze = []  # index of rows of the maze - built as they go
         temp = []  # allows for construction of each row independent of size
         holdover = []  # elements in the row that were obstacles
-        for i in range(self.height):
-            for j in range(self.width):  # Build row from the width of the grid input
+        for j in range(self.width):  # Astar takes xy backwards for this implementation
+            for i in range(self.height):  # Build row from the width of the grid input
                 temp.append(self.raw_map_data[i * self.width + j])
             row = [0] * len(temp)
             for ind in holdover:  # Add extra space for things that were obstacles last time
@@ -82,14 +82,14 @@ class TerrainMap:
                     try:
                         row[index + 1] = 1
                         row[index - 1] = 1
-                        maze[i - 1][index] = 1
+                        maze[j - 1][index] = 1
                     except IndexError:
                         pass
             maze.append(row)
             temp = []
-        rospy.loginfo("\n" + str(maze[::-1]))
+        rospy.loginfo("\n" + str(maze))
         if len(maze) > 0:
-            tuple_path = astar(maze[::-1], start, end)
+            tuple_path = astar(maze, start, end)
         else:
             tuple_path = [(0, 0)]
         path = make_points(tuple_path)
